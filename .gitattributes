@@ -8,6 +8,7 @@
 ###############################################################################
 * working-tree-encoding=cp1252
 * encoding=cp1252
+*.arc=binary
 *.h diff=cpp
 *.hpp diff=cpp
 *.c diff=cpp
