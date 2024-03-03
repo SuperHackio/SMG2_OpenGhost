@@ -9,6 +9,7 @@
 #include "Game/Player/RaceDataReader.h"
 #include "Game/Animation/XanimePlayer.h"
 
+extern void* sInstance__Q213NrvMarioActor19MarioActorNrvNoRush;
 
 /* ==== SMG2 OpenGhost ====
 * This Module re-adds GhostPlayer to the game!
@@ -16,7 +17,7 @@
 * This module does NOT depend on GalaxyGST directly, but you need it to record the Ghost Data (.gst)
 * 
 * Port by Super Hackio
-* Github Repository: https://github.com/SuperHackio/SMG2_OpenGhost
+* Github Repository: 
 * 
 * 
 * ObjArg0 = GstFile ID. Example: Setting it to 4 will load GhostPlayerData04.gst / GhostPlayerData04Luigi.gst. GhostPlayerData00 is the default.
@@ -127,6 +128,8 @@ namespace NrvGhostPlayer
 void raceDataReaderTryPlayActionSoundName(RaceDataReader* pReader, const char* pName);
 void raceDataReaderTryPlayActionSoundHash(RaceDataReader* pReader, u32 hash);
 
+bool raceDataReaderIsSound(RaceDataReader* pReader);
+void raceDataReaderSetSound(RaceDataReader* pReader, bool toggle);
 
 namespace MR
 {
