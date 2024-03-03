@@ -146,7 +146,7 @@
 	{
 		//MUCH simpler in SMG2...
 		setAnimation("Šî–{");
-		mGstFileData->mUseGhostSound = true;
+		raceDataReaderSetSound(mGstFileData, true);
 	}
 
 	//Didn't feel like writing a GX header
@@ -211,6 +211,9 @@
 		//Is it even possible to be NULL at this point?
 		if (mGstFileData == NULL || _113)
 			return;
+
+		if (MR::isNormalTalking() || MR::isSystemTalking())
+			return; // not having this could actually crash the game
 
 		if (receiveGhostPacket() != 0)
 		{
@@ -629,7 +632,7 @@
 	RaceDataReader* raceDataReaderSetUseSoundOff(RaceDataReader* pReader)
 	{
 		pReader->mUseXanimePlayer = false;
-		pReader->mUseGhostSound = false;
+		raceDataReaderSetSound(pReader, false);
 		return pReader;
 	}
 
@@ -639,7 +642,7 @@
 	void raceDataReaderTryPlayActionSoundName(RaceDataReader* pReader, const char* pName)
 	{
 		pReader->startActionName(pName);
-		if (pReader->mUseGhostSound)
+		if (raceDataReaderIsSound(pReader))
 		{
 			GhostSoundData* pData = GhostPlayer::playSound(pName);
 			if (pData == NULL)
@@ -658,7 +661,7 @@
 	void raceDataReaderTryPlayActionSoundHash(RaceDataReader* pReader, u32 hash)
 	{
 		pReader->startActionHash(hash);
-		if (pReader->mUseGhostSound)
+		if (raceDataReaderIsSound(pReader))
 		{
 			GhostSoundData* pData = GhostPlayer::playSound(pReader->_38->getCurrentAnimationName());
 			if (pData == NULL)
@@ -672,6 +675,18 @@
 		}
 	}
 	kmCall(0x80376314, raceDataReaderTryPlayActionSoundHash);
+
+
+	asm bool raceDataReaderIsSound(RaceDataReader* pReader)
+	{
+		lbz r3, 0x41(r3)
+		blr
+	}
+	asm void raceDataReaderSetSound(RaceDataReader* pReader, bool toggle)
+	{
+		stb r4, 0x41(r3)
+		blr
+	}
 
 #include "Game/System/WPadHolder.h"
 
