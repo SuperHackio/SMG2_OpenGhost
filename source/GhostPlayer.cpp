@@ -344,7 +344,7 @@
 			MR::startSound(this, "SE_BM_GHOST_MARIO_APPEAR", -1, -1);
 			MR::startSound(this, "SE_BV_GHOST_MARIO_APPEAR", -1, -1);
 			MR::offPlayerControl();
-			mCameraTargetMtx->mMatrix.set((MtxPtr)getBaseMtx());
+			mCameraTargetMtx->setMtx(getBaseMtx());
 			CameraTargetArg CTA = CameraTargetArg(mCameraTargetMtx);
 			MR::startMultiActorCameraTargetOther(this, mCameraInfo, "レース開始1", CTA, -1);
 			warpPosition("ゴーストデモゴースト位置");
@@ -390,7 +390,7 @@
 		if (getNerveStep() == 0xF0)
 		{
 			MR::endMultiActorCamera(this, mCameraInfo, "レース開始1", false, -1);
-			mCameraTargetMtx->mMatrix.set((MtxPtr)getBaseMtx());
+			mCameraTargetMtx->setMtx((MtxPtr)getBaseMtx());
 			CameraTargetArg CTA2 = CameraTargetArg(mCameraTargetMtx);
 			MR::startMultiActorCameraTargetOther(this, mCameraInfo, "レース開始2", CTA2, -1);
 			setNerve(NrvGhostPlayerPreStartDemo1);
@@ -464,7 +464,7 @@
 			if (!MR::vecBlendSphere(&FrontVec, VecNormalize, FrontVec, 0.1f))
 				FrontVec = VecNormalize;
 
-			MR::makeMtxUpFront(getBaseMtx(), VecUnk, FrontVec);
+			MR::makeMtxUpFront((TPos3f*)getBaseMtx(), VecUnk, FrontVec);
 			//Don't update these as the gst data will reset the position instead
 			//PSMTXCopy((MtxPtr)getBaseMtx(), (MtxPtr)&mGstFileData->_8);
 			//MR::extractMtxTrans((MtxPtr)getBaseMtx(), &mTranslation);
