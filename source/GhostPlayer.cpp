@@ -480,11 +480,7 @@
 			//MR::NoticePlayerDashChance
 			{
 				Mario* pMario = MR::getMarioHolder()->getMarioActor()->mMario;
-				//Need to hack this together because we don't have symbols :(
-				u8* Addr = pMario->_0;
-				Addr += 0x432;
-				u16* DashNoticeAddr = (u16*)Addr;
-				*DashNoticeAddr = DASHNOTICE_AMOUNT;
+				pMario->mDashNotice = DASHNOTICE_AMOUNT;
 			}
 			MR::startBckPlayerJ("Šî–{");
 			//Don't need to play the race start sfx, the layout does it for us
