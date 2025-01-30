@@ -6,8 +6,10 @@ This is a reimplementation of Cosmic Races from Super Mario Galaxy. This is not 
 
 Below is a list of everything included:
 - The ObjectData archives for Cosmic Mario & Cosmic Luigi
+  - Also includes custom Rolling Rocks for use with the Rock Mushroom
 - The "GhostPlayer" object in the Editor
 - The "Ghost" Comet type in the Scenario
+- A decorative "GhostPowerUpRock" object, which you will have to add to the ProductMapObjDataTable before using. (Class type is up for you to decide)
 
 Below is a list of other things that you will need:
 - [GalaxyGST](https://github.com/SunakazeKun/galaxygst)

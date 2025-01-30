@@ -2,6 +2,7 @@
 
 #include "syati-light.h"
 #include "Game/LiveActor/LiveActor.h"
+#include "Game/LiveActor/PartsModel.h"
 #include "Game/Map/StartCountdownLayout.h"
 #include "Game/Player/JetTurtleShadow.h"
 #include "Game/Util/ActorCameraUtil.h"
@@ -102,6 +103,9 @@ public:
 	RaceDataReader* mGstFileData; //_128
 	StartCountdownLayout* mRaceManagerLayout; //_12C
 	CameraTargetMtx* mCameraTargetMtx; //_130
+	FixedPosition* mOriginFixedPos;
+	PartsModel* mRollingRock; // NEW
+	bool mEnableRollingRock; // NEW
 };
 
 namespace NrvGhostPlayer

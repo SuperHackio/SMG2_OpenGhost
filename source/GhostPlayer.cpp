@@ -19,6 +19,7 @@
 #include "Game/Util/DemoUtil.h"
 #include "Game/Util/EffectUtil.h"
 #include "Game/Util/EventUtil.h"
+#include "Game/Util/FileUtil.h"
 #include "Game/Util/GamePadUtil.h"
 #include "Game/Util/JMapUtil.h"
 #include "Game/Util/LiveActorUtil.h"
@@ -37,7 +38,7 @@
 #define GHOSTNAME_MARIO "GhostMario"
 #define GHOSTNAME_LUIGI "GhostLuigi"
 #define GENERALPOS_RACE_END_POSITION "負け時マリオ位置"
-//Change this to change the availibility of the starting boost. Longer means easier to to
+//Change this to change the availibility of the starting boost. Longer means easier to do
 #define DASHNOTICE_AMOUNT 5
 #define GHOSTDATA_FILENAME "GhostPlayerData"
 
@@ -57,6 +58,8 @@
 		_115 = false;
 
 		mGstFileData = NULL;
+
+		mRollingRock = NULL;
 	}
 
 	void GhostPlayer::init(const JMapInfoIter& rIter)
@@ -133,6 +136,7 @@
 		mJetTurtleShadow = new JetTurtleShadow("カメシャドウモデル");
 		mJetTurtleShadow->initWithoutIter();
 
+		mOriginFixedPos = new FixedPosition(this, "All_Root", TVec3f(0.f, 0.f, 0.f), TVec3f(0.f, 0.f, 0.f));
 		mHandRFixedPos = new FixedPosition(this, "HandR", TVec3f(15.59f, 42.5f, 42.93f), TVec3f(-17.05f, -0.7f, 113.55f));
 
 		MR::declareStarPiece(this, 50);
@@ -140,6 +144,11 @@
 
 		_124 = 0;
 		_126 = 0;
+
+		const char* pRollingRockName = MR::isPlayerLuigi() ? "GhostRockLuigiRollingRock" : "GhostRockMarioRollingRock";
+		mRollingRock = new PartsModel(this, "GhostPlayerRollingRock", pRollingRockName, NULL, MR::DrawBufferType_MapObj, true);
+		MR::invalidateClipping(mRollingRock);
+		MR::initShadowFromCSVWithoutInitShadowVolumeSphere(mRollingRock, "Shadow");
 	}
 
 	void GhostPlayer::initAnimation()
@@ -163,6 +172,10 @@
 		pModel->viewCalc(); //Might need to reimplement viewCalc2...
 		GXInvalidateVtxCache();
 		((J3DModelX*)pModel)->directDraw(NULL); //This looks horrible...
+
+		pModel = MR::getJ3DModel(mRollingRock);
+		pModel->viewCalc();
+		mOriginFixedPos->calc();
 	}
 
 	void GhostPlayer::appear() {
@@ -188,19 +201,26 @@
 	}
 
 	void GhostPlayer::control() {
+		_115 = false; //Disable Koopa Shells
+
 		if (_111)
 			return;
 
 		if (MR::isDead(this))
 			return;
 
+		const char* pCurrentBckName = MR::getPlayingBckName(this);
+		//OSReport("GhostPlayer: %s\n", pCurrentBckName);
+		mEnableRollingRock = MR::isEqualString(pCurrentBckName, "RollingRockStart");
+
 		MR::startActionSound(this, "BmLvGhostMarioAmbient", -1, -1, -1);
 
-		if (isNerve(NrvGhostPlayerLostDemo))
+		if (isNerve(NrvGhostPlayerLostDemo) || isNerve(NrvGhostPlayerWinDemo))
+		{
+			mRollingRock->makeActorDead();
+			MR::invalidateShadow(this, NULL);
 			return;
-
-		if (isNerve(NrvGhostPlayerWinDemo))
-			return;
+		}
 
 		if (isPlayerInPowerStarGet() && isNerve(NrvGhostPlayerRun))
 		{
@@ -214,6 +234,19 @@
 
 		if (MR::isNormalTalking() || MR::isSystemTalking())
 			return; // not having this could actually crash the game
+
+
+		if (mEnableRollingRock)
+		{
+			mRollingRock->makeActorAppeared();
+			MR::invalidateShadow(this, NULL);
+		}
+		else
+		{
+			mRollingRock->makeActorDead();
+			MR::invalidateShadow(this, NULL);
+		}
+		mOriginFixedPos->calc();
 
 		if (receiveGhostPacket() != 0)
 		{
@@ -238,6 +271,12 @@
 		{
 			mHandRFixedPos->calc();
 			mJetTurtleShadow->calcType0((MtxPtr)&mHandRFixedPos->_1C);
+		}
+		if (mEnableRollingRock)
+		{
+			mOriginFixedPos->calc();
+			mOriginFixedPos->copyTrans(&mRollingRock->mTranslation);
+			mOriginFixedPos->copyRotate(&mRollingRock->mRotation);
 		}
 	}
 
@@ -330,9 +369,9 @@
 		mGstFileData->setTrackWeight(3, weight);
 	}
 	void GhostPlayer::warpPosition(const char* pName) {
-		MR::findNamePos(pName, (MtxPtr)getBaseMtx());
-		PSMTXCopy((MtxPtr)getBaseMtx(), (MtxPtr)&mGstFileData->_8);
-		MR::extractMtxTrans((MtxPtr)getBaseMtx(), &mTranslation);
+		MR::findNamePos(pName, getBaseMtx());
+		PSMTXCopy(getBaseMtx(), (MtxPtr)&mGstFileData->_8);
+		MR::extractMtxTrans(getBaseMtx(), &mTranslation);
 	}
 
 	void GhostPlayer::exeWait() {
@@ -504,6 +543,7 @@
 			//Reimplement MR::readyPlayerDemo
 			{
 				MarioActor* pMarioActor = MR::getMarioHolder()->getMarioActor();
+				pMarioActor->setPlayerMode(0, true, true);
 				if (pMarioActor->mIsInRush)
 				{
 					if (!pMarioActor->getSensor("Body")->
