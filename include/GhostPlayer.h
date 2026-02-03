@@ -1,6 +1,5 @@
 #pragma once
 
-#include "syati-light.h"
 #include "Game/LiveActor/LiveActor.h"
 #include "Game/LiveActor/PartsModel.h"
 #include "Game/Map/StartCountdownLayout.h"
@@ -22,6 +21,11 @@ extern void* sInstance__Q213NrvMarioActor19MarioActorNrvNoRush;
 * 
 * 
 * ObjArg0 = GstFile ID. Example: Setting it to 4 will load GhostPlayerData04.gst / GhostPlayerData04Luigi.gst. GhostPlayerData00 is the default.
+* ObjArg1 = Racer.
+*			-1 : "Auto Match Player" (Mario races against Cosmic Mario, Luigi races against Cosmic Luigi)
+*			 0 : "Always Cosmic Mario"
+*			 1 : "Always Cosmic Luigi"
+*           -2 : "Auto Oppose Player" (Mario races against Cosmic Luigi, Luigi races against Cosmic Mario)
 * 
 * SW_APPEAR = Activation. Activate the switch to start the race sequence
 */
@@ -106,6 +110,7 @@ public:
 	FixedPosition* mOriginFixedPos;
 	PartsModel* mRollingRock; // NEW
 	bool mEnableRollingRock; // NEW
+	bool mIsLuigi; // NEW
 };
 
 namespace NrvGhostPlayer

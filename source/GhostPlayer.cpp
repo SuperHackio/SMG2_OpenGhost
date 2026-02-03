@@ -69,26 +69,29 @@
 
 		char GhostFileName[256];
 
-		s32 ObjArg0 = 0;
+		s32 ObjArg0 = 0, ObjArg1 = -1;
 		MR::getJMapInfoArg0NoInit(rIter, &ObjArg0);
+		MR::getJMapInfoArg1NoInit(rIter, &ObjArg1);
 
-		if (MR::isPlayerLuigi())
+		mIsLuigi = MR::isPlayerLuigi();
+		if (ObjArg1 == -2)
+			mIsLuigi = !mIsLuigi;
+		else if (ObjArg1 != -1)
+			mIsLuigi = ObjArg1 > 0;
+
+		if (mIsLuigi)
 		{
 			//Fetch Luigi Ghost Data
 			sprintf(GhostFileName, "%s%02dLuigi.gst", GHOSTDATA_FILENAME, ObjArg0);
+			initModelManagerWithAnm(GHOSTNAME_LUIGI, NULL, NULL, false);
 		}
 		else
 		{
 			//Fetch Mario Ghost Data
 			sprintf(GhostFileName, "%s%02d.gst", GHOSTDATA_FILENAME, ObjArg0);
+			initModelManagerWithAnm(GHOSTNAME_MARIO, NULL, NULL, false);
 		}
 		//Updating this from SMG1 to use the Ghost archive
-
-		if (MR::isPlayerLuigi())
-			initModelManagerWithAnm(GHOSTNAME_LUIGI, NULL, NULL, false);
-		else
-			initModelManagerWithAnm(GHOSTNAME_MARIO, NULL, NULL, false);
-
 		mGstFileData = new RaceDataReader(this, GhostFileName, MR::getPlayerXanimeResource());
 		if (mGstFileData == NULL) //is this even possible in SMG2? Lol
 		{
@@ -145,7 +148,7 @@
 		_124 = 0;
 		_126 = 0;
 
-		const char* pRollingRockName = MR::isPlayerLuigi() ? "GhostRockLuigiRollingRock" : "GhostRockMarioRollingRock";
+		const char* pRollingRockName = mIsLuigi ? "GhostRockLuigiRollingRock" : "GhostRockMarioRollingRock";
 		mRollingRock = new PartsModel(this, "GhostPlayerRollingRock", pRollingRockName, NULL, MR::DrawBufferType_MapObj, true);
 		MR::invalidateClipping(mRollingRock);
 		MR::initShadowFromCSVWithoutInitShadowVolumeSphere(mRollingRock, "Shadow");
@@ -186,7 +189,7 @@
 		_110 = true;
 		MR::invalidateShadow(this, NULL);
 
-		if (MR::isPlayerLuigi())
+		if (mIsLuigi)
 		{
 			MR::startBtk(this, GHOSTNAME_LUIGI);
 			MR::startBrk(this, GHOSTNAME_LUIGI);
