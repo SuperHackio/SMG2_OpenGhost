@@ -30,7 +30,7 @@ extern void* sInstance__Q213NrvMarioActor19MarioActorNrvNoRush;
 * SW_APPEAR = Activation. Activate the switch to start the race sequence
 */
 
-
+class ActorStateParamScale;
 
 struct GhostSoundData
 {
@@ -46,6 +46,7 @@ public:
 
 	virtual void init(const JMapInfoIter& rIter);
 
+	virtual void movement();
 	virtual void draw() const;
 
 	virtual void appear();
@@ -109,6 +110,7 @@ public:
 	CameraTargetMtx* mCameraTargetMtx; //_130
 	FixedPosition* mOriginFixedPos;
 	PartsModel* mRollingRock; // NEW
+	ActorStateParamScale* mParamScale; // NEW
 	bool mEnableRollingRock; // NEW
 	bool mIsLuigi; // NEW
 };

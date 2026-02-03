@@ -34,6 +34,7 @@
 #include "Game/System/AllData/GameSequenceFunction.h"
 #include "Game/System/GameSequenceInGame.h"
 #include "Game/System/PlayResultInStageHolder.h"
+#include "Game/LiveActor/ActorStateParamScale.h"
 
 #define GHOSTNAME_MARIO "GhostMario"
 #define GHOSTNAME_LUIGI "GhostLuigi"
@@ -152,6 +153,9 @@
 		mRollingRock = new PartsModel(this, "GhostPlayerRollingRock", pRollingRockName, NULL, MR::DrawBufferType_MapObj, true);
 		MR::invalidateClipping(mRollingRock);
 		MR::initShadowFromCSVWithoutInitShadowVolumeSphere(mRollingRock, "Shadow");
+
+		mParamScale = new ActorStateParamScale(this);
+		mParamScale->init(rIter);
 	}
 
 	void GhostPlayer::initAnimation()
@@ -159,6 +163,12 @@
 		//MUCH simpler in SMG2...
 		setAnimation("Šî–{");
 		raceDataReaderSetSound(mGstFileData, true);
+	}
+
+	void GhostPlayer::movement() {
+		mParamScale->update();
+		LiveActor::movement();
+		mParamScale->resetHostVelocity();
 	}
 
 	//Didn't feel like writing a GX header
@@ -204,6 +214,7 @@
 	}
 
 	void GhostPlayer::control() {
+		mParamScale->calcHostVelocity();
 		_115 = false; //Disable Koopa Shells
 
 		if (_111)
@@ -350,8 +361,20 @@
 		return (GameSequenceFunction::getGameSequenceInGame()->getPlayResultInStageHolder()->mMissNum > 0) && MR::testCorePadTriggerA(0);
 	}
 	bool GhostPlayer::receiveGhostPacket() {
+		//OSReport("%d == %d\n", (s32)mParamScale->getNerveStepRate(), (s32)mParamScale->mPrevNerveRate);
+		if (!mParamScale->isFirstStep() && (s32)mParamScale->getNerveStepRate() == (s32)mParamScale->mPrevNerveRate)
+			return false;
+
+		f32 oldbckrate = MR::getBckRate(this);
 		bool IsActive = mGstFileData->receivePacket();
-	
+
+		f32 bckrate = MR::getBckRate(this);
+		f32 scalerate = bckrate * mParamScale->getSpeed();
+		if (oldbckrate != scalerate) {
+			//OSReport("%ff | %ff -> %ff\n", oldbckrate, bckrate, scalerate);
+			MR::setBckRate(this, scalerate);
+		}
+
 		if (_124 != 0)
 			_124--;
 		if (_126 != 0)
