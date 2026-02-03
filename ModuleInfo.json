@@ -2,6 +2,7 @@
   "Name": "SMG2 OpenGhost",
   "Author": "Super Hackio",
   "Description": "Cosmic Races in SMG2",
+  "SupportedGames": [ "SB4" ],
 
   "ModuleData": [
     {
