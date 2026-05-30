@@ -284,7 +284,7 @@
 		if (_115)
 		{
 			mHandRFixedPos->calc();
-			mJetTurtleShadow->calcType0((MtxPtr)&mHandRFixedPos->_1C);
+			mJetTurtleShadow->calcType0((MtxPtr)&mHandRFixedPos->mMtx);
 		}
 		if (mEnableRollingRock)
 		{
